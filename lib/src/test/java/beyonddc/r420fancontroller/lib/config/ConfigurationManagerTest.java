@@ -47,6 +47,41 @@ public class ConfigurationManagerTest {
 
       Assertions.assertEquals(3, fanSensorNames.size());
 
+      // Reading it fome file again and compare it
+      Assertions.assertEquals(3, (new ConfigurationManagerImpl()).getFanSensorNames().size());
+
+    } finally {
+
+      System.setProperty("user.home", existingUserHome);
+
+      FileUtils.deleteDirectory(
+          new File(
+              String.format("%s/%s",
+                  "/tmp",
+                  ConfigurationManagerImpl.DEFAULT_DATA_DIR)));
+    }
+  }
+
+  @Test
+  public void saveTempSensorNames() throws IOException {
+
+    final String existingUserHome = System.getProperty("user.home");
+
+    try {
+
+      System.setProperty("user.home", "/tmp");
+
+      final IConfigurationManager configMgr = new ConfigurationManagerImpl();
+
+      configMgr.saveTempSensorNames(Arrays.asList(new String[]{"Temp1", "Temp2"}));
+
+      final List<String> tempSensorNames = configMgr.getTempSensorNames();
+
+      Assertions.assertEquals(2, tempSensorNames.size());
+
+      // Reading it fome file again and compare it
+      Assertions.assertEquals(2, (new ConfigurationManagerImpl()).getTempSensorNames().size());
+
     } finally {
 
       System.setProperty("user.home", existingUserHome);

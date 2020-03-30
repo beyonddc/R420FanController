@@ -1,5 +1,7 @@
 package beyonddc.r420fancontroller.lib.config;
 
+import beyonddc.r420fancontroller.lib.model.IIPMIConnection;
+import beyonddc.r420fancontroller.lib.model.IPMIConnectionImpl;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,6 +19,12 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 public class ConfigurationManagerImpl implements IConfigurationManager {
 
   private static final String R420_FAN_CONTROLLER_PROPERTIES = "r420fancontroller.properties";
+
+  private static final String IPMI_IP = "ipmi.ip";
+
+  private static final String IPMI_USERNAME = "ipmi_username";
+
+  private static final String IPMI_PASSWORD = "ipmi_password";
 
   private static final String FAN_SENSOR_NAMES_PROPERTY = "fan.sensor.names";
 
@@ -50,12 +58,28 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
         this.getFileBasedConfigurationBuilder(savedProperties);
   }
 
+  public IIPMIConnection getIPMIConnection() {
+
+    final String ip = this.configuration.getString(IPMI_IP);
+    final String username = this.configuration.getString(IPMI_USERNAME);
+    final String password = this.configuration.getString(IPMI_PASSWORD);
+
+    return IPMIConnectionImpl.newInstance(ip, password, username);
+  }
+
   public List<String> getFanSensorNames() {
     return this.getPropertyAsList(FAN_SENSOR_NAMES_PROPERTY);
   }
 
   public List<String> getTempSensorNames() {
     return this.getPropertyAsList(TEMP_SENSOR_NAMES_PROPERTY);
+  }
+
+  public void saveIPMIConnection(IIPMIConnection ipmiConnection) {
+    this.configuration.setProperty(IPMI_IP, ipmiConnection.getIP());
+    this.configuration.setProperty(IPMI_USERNAME, ipmiConnection.getUsername());
+    this.configuration.setProperty(IPMI_PASSWORD, ipmiConnection.getPassword());
+    this.saveConfiguration(this.configuration, this.configurationBuilder);
   }
 
   public void saveFanSensorNames(final List<String> fanSensorNames) {
