@@ -9,4 +9,10 @@ import java.util.List;
 public interface IConfigurationManager {
 
   List<String> getFanSensorNames();
+
+  List<String> getTempSensorNames();
+
+  void saveFanSensorNames(List<String> fanSensorNames);
+
+  void saveTempSensorNames(List<String> tempSensorNames);
 }
