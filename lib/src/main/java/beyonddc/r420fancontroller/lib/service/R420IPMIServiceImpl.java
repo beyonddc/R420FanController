@@ -60,6 +60,8 @@ public class R420IPMIServiceImpl implements IR420IPMIService {
 
           sensorReadings.put(sensor, reading);
         }
+      } else {
+        LOGGER.error("Failed to get sensor readings: " + processResult.outputUTF8());
       }
 
     } catch (IOException | InterruptedException | ExecutionException e) {
@@ -68,6 +70,111 @@ public class R420IPMIServiceImpl implements IR420IPMIService {
     }
 
     return sensorReadings;
+  }
+
+  /**
+   * ipmitool -I lanplus -H 192.168.8.97 -U root -f ./idrac_p raw 0x30 0x30 0x02 0xff 0x0a
+   */
+  @Override
+  public void setFanSpeed(
+      final IIPMIConnection ipmiConnection, final int fanSpeedPercentage) {
+
+    if (fanSpeedPercentage < 11 || fanSpeedPercentage > 100) {
+      throw new IllegalArgumentException("Fan speed percentage is invalid: " + fanSpeedPercentage);
+    }
+
+    final List<String> cliInput = this.populateIPMIConnectionCLIInput(ipmiConnection);
+
+    cliInput.add("raw");
+    cliInput.add("0x30");
+    cliInput.add("0x30");
+    cliInput.add("0x02");
+    cliInput.add("0xff");
+    cliInput.add(this.intToHex(fanSpeedPercentage));
+
+    try {
+
+      final Future<ProcessResult> processResultFuture = new ProcessExecutor()
+          .readOutput(true)
+          .command(cliInput).start().getFuture();
+
+      final ProcessResult processResult = processResultFuture.get();
+
+      final int exitValue = processResult.getExitValue();
+
+      if (exitValue != 0) {
+        LOGGER.error(
+            "Failed to set fan speed: "
+                + fanSpeedPercentage
+                + " Output: " + processResult.outputUTF8());
+      }
+
+    } catch (IOException | InterruptedException | ExecutionException e) {
+
+      LOGGER.error(
+          "Failed to set fan speed: " + fanSpeedPercentage, e);
+    }
+  }
+
+  /**
+   * # Enable manual fan control
+   * ipmitool -I lanplus -H 192.168.8.97 -U root -f ./idrac_p raw 0x30 0x30 0x01 0x00
+   *
+   * # Disable manual fan control
+   * ipmitool -I lanplus -H 192.168.8.97 -U root -f ./idrac_p raw 0x30 0x30 0x01 0x01
+   */
+  @Override
+  public void setManualFanControl(
+      final IIPMIConnection ipmiConnection,
+      final boolean onOffSwitch) {
+
+    final List<String> cliInput = this.populateIPMIConnectionCLIInput(ipmiConnection);
+
+    cliInput.add("raw");
+    cliInput.add("0x30");
+    cliInput.add("0x30");
+    cliInput.add("0x01");
+
+    if (onOffSwitch) {
+      cliInput.add("0x00");
+    } else {
+      cliInput.add("0x01");
+    }
+
+    try {
+
+      final Future<ProcessResult> processResultFuture = new ProcessExecutor()
+          .readOutput(true)
+          .command(cliInput).start().getFuture();
+
+      final ProcessResult processResult = processResultFuture.get();
+
+      final int exitValue = processResult.getExitValue();
+
+      if (exitValue != 0) {
+        LOGGER.error(
+            "Failed to set manual fan control: "
+                + onOffSwitch
+                + " Output: " + processResult.outputUTF8());
+      }
+
+    } catch (IOException | InterruptedException | ExecutionException e) {
+
+      LOGGER.error("Failed to set manual fan control: " + onOffSwitch, e);
+    }
+  }
+
+  protected String intToHex(final int integer) {
+
+    String hexString = Integer.toHexString(integer);
+
+    if (hexString.length() == 1) {
+      hexString = String.format("0x0%s", hexString);
+    } else if (hexString.length() == 2) {
+      hexString = String.format("0x%s", hexString);
+    }
+
+    return hexString;
   }
 
   private List<String> populateIPMIConnectionCLIInput(

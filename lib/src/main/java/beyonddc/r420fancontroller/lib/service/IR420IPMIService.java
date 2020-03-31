@@ -12,4 +12,10 @@ public interface IR420IPMIService {
    */
   Map<String, String> getSensorReadings(
       IIPMIConnection ipmiConnection, List<String> sensorNames);
+
+  void setFanSpeed(
+      IIPMIConnection ipmiConnection, int fanSpeedPercentage);
+
+  void setManualFanControl(
+      IIPMIConnection ipmiConnection, boolean onOffSwitch);
 }
