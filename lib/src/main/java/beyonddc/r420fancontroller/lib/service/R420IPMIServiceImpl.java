@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessOutput;
 import org.zeroturnaround.exec.ProcessResult;
@@ -17,6 +19,8 @@ public class R420IPMIServiceImpl implements IR420IPMIService {
 
   private static final String IPMITOOL = "ipmitool";
   private static final String LANPLUS = "lanplus";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(R420IPMIServiceImpl.class);
 
   /**
    * ipmitool -I lanplus -H 192.168.8.97 -U root -f ./idrac_p sensor reading "Temp" "Fan1A" "Fan1B" "Fan2A" "Fan2B" "Fan3A" "Fan3B" "Fan4A" "Fan4B" "Fan5A" "Fan5B" "Fan6A" "Fan6B"
@@ -60,7 +64,7 @@ public class R420IPMIServiceImpl implements IR420IPMIService {
 
     } catch (IOException | InterruptedException | ExecutionException e) {
 
-      e.printStackTrace();
+      LOGGER.error("Failed to get sensor readings", e);
     }
 
     return sensorReadings;

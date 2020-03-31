@@ -6,8 +6,12 @@ import beyonddc.r420fancontroller.lib.model.IPMIConnectionImpl;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class R420IPMIServiceTest {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(R420IPMIServiceTest.class);
 
   @Test
   public void testGetSensorReadings() throws IOException {
@@ -22,7 +26,7 @@ public class R420IPMIServiceTest {
             (new ConfigurationManagerImpl()).getFanSensorNames());
 
     for(final String key : readings.keySet()) {
-      System.out.println(String.format("Sensor: '%s', Reading: '%s'", key, readings.get(key)));
+      LOGGER.debug(String.format("Sensor: '%s', Reading: '%s'", key, readings.get(key)));
     }
   }
 }

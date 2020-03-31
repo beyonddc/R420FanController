@@ -15,6 +15,8 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationManagerImpl implements IConfigurationManager {
 
@@ -29,6 +31,8 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
   private static final String FAN_SENSOR_NAMES_PROPERTY = "fan.sensor.names";
 
   private static final String TEMP_SENSOR_NAMES_PROPERTY = "temp.sensor.names";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
 
   protected static final String DEFAULT_DATA_DIR = ".r420fancontroller";
 
@@ -168,7 +172,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
     } catch (ConfigurationException e) {
 
-      e.printStackTrace();
+      LOGGER.error("Failed to load configuration", e);
     }
 
     return config;
@@ -194,7 +198,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
     } catch (final ConfigurationException | IOException e) {
 
-      e.printStackTrace();
+      LOGGER.error("Failed to save configuration", e);
     }
   }
 }
