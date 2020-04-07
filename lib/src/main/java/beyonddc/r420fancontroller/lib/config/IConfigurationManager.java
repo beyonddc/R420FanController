@@ -15,6 +15,8 @@ public interface IConfigurationManager {
 
   List<String> getTempSensorNames();
 
+  int getSensorsCheckInterval();
+
   void saveIPMIConnection(IIPMIConnection impiConnection);
 
   void saveFanSensorNames(List<String> fanSensorNames);

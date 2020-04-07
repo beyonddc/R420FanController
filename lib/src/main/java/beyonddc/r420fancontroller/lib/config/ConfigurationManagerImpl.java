@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConfigurationManagerImpl implements IConfigurationManager {
 
+  private static final int DEFAULT_SENSORS_CHECK_INTERVAL = 5;
+
   private static final String R420_FAN_CONTROLLER_PROPERTIES = "r420fancontroller.properties";
 
   private static final String IPMI_IP = "ipmi.ip";
@@ -31,6 +33,8 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
   private static final String FAN_SENSOR_NAMES_PROPERTY = "fan.sensor.names";
 
   private static final String TEMP_SENSOR_NAMES_PROPERTY = "temp.sensor.names";
+
+  private static final String SENSORS_CHECK_INTERVAL_PROPERTY = "sensors.check.interval";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
 
@@ -77,6 +81,11 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
   public List<String> getTempSensorNames() {
     return this.getPropertyAsList(TEMP_SENSOR_NAMES_PROPERTY);
+  }
+
+  public int getSensorsCheckInterval() {
+    return this.configuration.getInt(
+        SENSORS_CHECK_INTERVAL_PROPERTY, DEFAULT_SENSORS_CHECK_INTERVAL);
   }
 
   public void saveIPMIConnection(IIPMIConnection ipmiConnection) {
